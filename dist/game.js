@@ -2741,14 +2741,14 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
   var HEIGHT = 768;
   loadSprite("flappy", "sprites/flappy.png");
   loadSprite("bg", "sprites/bg.png");
-  gravity(3200);
   scene("main", () => {
     const JUMP_FORCE = 800;
     const PIPE_OPEN = 240;
     const PIPE_MIN = 60;
     const SPEED = 320;
     const CEILING = -55;
-    layers(["bg", "abj", "ui"], "obj");
+    layers(["bg", "obj", "ui"], "obj");
+    gravity(3200);
     const flappy = add([
       sprite("flappy"),
       pos(WIDTH / 4, 0),
@@ -2761,15 +2761,15 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
       layer("bg")
     ]);
     mouseClick(() => {
-      flappy.jump(800);
+      flappy.jump(JUMP_FORCE);
     });
     flappy.action(() => {
-      if (flappy.pos.y >= HEIGHT) {
+      if (flappy.pos.y >= HEIGHT || flappy.pos.y <= CEILING) {
         go("lose");
       }
     });
     function spawnPipe() {
-      let h1 = rand(PIPE_MIN, HEIGHT - PIPE_MIN - PIPE - OPEN);
+      let h1 = rand(PIPE_MIN, HEIGHT - PIPE_MIN - PIPE_OPEN);
       let h2 = HEIGHT - h1 - PIPE_OPEN;
       add([
         pos(WIDTH, 0),
@@ -2796,8 +2796,35 @@ vec4 frag(vec3 pos, vec2 uv, vec4 color, sampler2D tex) {
     loop(1, () => {
       spawnPipe();
     });
+    flappy.collides("pipe", () => {
+      go("lose");
+    });
   });
   scene("lose", () => {
+    add([
+      sprite("bg"),
+      pos(0, 0)
+    ]);
+    add([
+      sprite("flappy"),
+      pos(WIDTH / 2, HEIGHT / 2 - 100),
+      scale(3),
+      origin("center")
+    ]);
+    add([
+      text("Game Over"),
+      pos(WIDTH / 2, HEIGHT / 2 - 100),
+      scale(2.5),
+      origin("center")
+    ]);
+    add([
+      text("CLICK TO PLAY AGAIN"),
+      pos(WIDTH / 2, HEIGHT / 2 + 300),
+      origin("center")
+    ]);
+    mouseClick(() => {
+      go("main");
+    });
   });
   go("main");
 })();

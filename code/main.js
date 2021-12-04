@@ -11,11 +11,9 @@ kaboom({
 const WIDTH = 1024;
 const HEIGHT = 768;
 
-// load assets
+
 loadSprite("flappy", "sprites/flappy.png");
 loadSprite("bg", "sprites/bg.png");
-
-gravity(3200);
 
 scene("main", () => {
   const JUMP_FORCE = 800;
@@ -24,9 +22,10 @@ scene("main", () => {
   const SPEED = 320;
   const CEILING = -55;
 
-  layers(["bg", "abj", "ui"], "obj");
+  layers(["bg", "obj", "ui"], "obj");
 
-// add a character to screen
+  gravity(3200);
+
 const flappy = add([
 	// list of components
 	sprite("flappy"),
@@ -40,8 +39,9 @@ sprite("bg"),
 pos(0, 0),
 layer("bg"),
 ])
+
 mouseClick(() =>{
-  flappy.jump(800);
+  flappy.jump(JUMP_FORCE);
 })
 
 flappy.action(() => {
@@ -51,7 +51,7 @@ flappy.action(() => {
 })
 
 function spawnPipe() {
-  let h1 = rand(PIPE_MIN, HEIGHT - PIPE_MIN - PIPE-OPEN);
+  let h1 = rand(PIPE_MIN, HEIGHT - PIPE_MIN - PIPE_OPEN);
   let h2 = HEIGHT - h1 - PIPE_OPEN;
 
   add([
@@ -81,6 +81,8 @@ add([
 loop(1, () =>{
 spawnPipe();
 })
+
+
 
 flappy.collides("pipe", () => {
   go("lose");
@@ -115,7 +117,9 @@ add([
   origin("center")
 ])
 
-mouseclick(())
+mouseClick(() => {
+go("main");
+})
 
 })
 
